@@ -4,7 +4,7 @@ import './StoryInput.css';
 const StoryInput = () => {
     const [story, setStory] = useState('');
     const [fileContent, setFileContent] = useState('');
-    const [extractedInfo, setExtractedInfo] = useState({ characters: [] });
+    const [extractedInfo, setExtractedInfo] = useState({ dialogues: [] });
     const [isLoading, setIsLoading] = useState(false);
 
     const API_KEY = "AIzaSyAe67VaV2KyO2qxIrhqxyn7MdsVDQpLe44";  // Replace with your actual API key
@@ -31,7 +31,7 @@ const StoryInput = () => {
 
             const requestBody = {
                 contents: [{
-                    parts: [{ text: "Generate a short story with 2 characters. The story should have clear character interactions and emotions. Generate this story in a play/drama like script. For eg: Bob: [dialogue]. Alice: [dialogue]. Give me the story with proper formatting and not in a single line." }]
+                    parts: [{ text: "Generate a short story with 2 characters. The story should have clear character interactions and emotions. Generate this story in a play/drama-like script. Use a structured format: 'Character Name: [dialogue]'. Ensure proper formatting, not in a single line." }]
                 }]
             };
 
@@ -61,15 +61,23 @@ const StoryInput = () => {
         }
     };
 
-    // 📌 Extract Characters & Phrases
+    // 📌 Extract Characters & Dialogues (Without Gender Field)
     const extractInformation = async (text) => {
         try {
             const requestBody = {
                 contents: [{
                     parts: [{ 
-                        text: `Analyze the following story and extract all characters with their gender and associated phrases/sentences. Return ONLY a JSON object without any markdown formatting or explanation, in this exact structure:
-                        {"characters":[{"name":"character name","gender":"character gender","phrases":["associated phrase 1","associated phrase 2"]}]}
+                        text: `Analyze the following story and extract all dialogues along with the speaker names. 
+                        Return ONLY a JSON array where each entry represents a single spoken line in the order it appears in the story. 
+                        Use this exact JSON format:
                         
+                        {"dialogues": [
+                            {"id": 1, "name": "Speaker Name", "dialogue": "Spoken dialogue"},
+                            {"id": 2, "name": "Next Speaker", "dialogue": "Next spoken dialogue"}
+                        ]}
+                        
+                        Do not include gender information. Do NOT return any explanations, markdown formatting, or additional text.
+
                         Story: ${text}`
                     }]
                 }]
@@ -87,14 +95,14 @@ const StoryInput = () => {
 
             const data = await response.json();
             const analysisText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-            
-            // Clean the response text and parse JSON
+
+            // Clean the response and parse JSON
             const cleanJson = analysisText.replace(/```json\n|\n```|```/g, '').trim();
             const analysis = JSON.parse(cleanJson);
             setExtractedInfo(analysis);
         } catch (error) {
             console.error('Error analyzing story:', error);
-            setExtractedInfo({ characters: [] });
+            setExtractedInfo({ dialogues: [] });
         }
     };
 
@@ -137,7 +145,7 @@ const StoryInput = () => {
                     
                     {/* Extracted Character Info */}
                     <div className="extracted-info">
-                        <h3>Character Analysis:</h3>
+                        <h3>Extracted Dialogues:</h3>
                         <pre>{JSON.stringify(extractedInfo, null, 2)}</pre>
                     </div>
 

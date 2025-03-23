@@ -6,7 +6,10 @@ const StoryInput = () => {
   const [extractedInfo, setExtractedInfo] = useState({ dialogues: [] });
   const [isLoading, setIsLoading] = useState(false);
 
-  const API_KEY = "AIzaSyD1WdS0RKr2AKKw7MRGsV9A9JAsGiLU1UY"; // Replace with your actual API key
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
+  if (!API_KEY) {
+    console.error("Missing VITE_GEMINI_API_KEY environment variable");
+  }
   const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
   // 📌 Handle File Upload

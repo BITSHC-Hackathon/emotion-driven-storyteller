@@ -58,7 +58,7 @@ To overcome these challenges, this system:
 
 ✅ Merge multiple audio tracks for seamless storytelling
 
-✅ Integrate background effects for enhanced immersion
+
 
 ### 6. Final Story Output
 
@@ -88,7 +88,6 @@ To overcome these challenges, this system:
 
 ✔️ **Automated Story Processing** – Fully AI-driven pipeline
 
-✔️ **Background Music Integration** – Enhances storytelling with sound effects
 
 ## Future Scope & Business Viability
 
@@ -112,32 +111,21 @@ To overcome these challenges, this system:
 
 - **Enterprise solutions** for media houses, publishers, and game studios
 
-## Installation & Setup
 
-```bash
-# Clone the repository
-git clone https://github.com/your-repo/dynamic-voice-story.git
-
-cd dynamic-voice-story
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the application
-python main.py
-```
 
 ## Tech Stack
 
-- **Machine Learning**: RoBERTa (Emotion Detection), Custom ML Model (Gender Detection)
+- **Machine Learning**:j-hartmann/emotion-english-distilroberta-base (Emotion Detection), Custom ML Model (Gender Detection),Transformers
 
 - **TTS API**: Eleven Labs
 
 - **Audio Processing**: Librosa, FFmpeg
 
-- **Backend**: Python (Flask/FastAPI), Microservices Architecture
+- **Backend**: Python (FastAPI), Microservices Architecture
 
-- **Storage**: Cloud-based solutions for scalable processing
+- **frontend**: react-vite
+
+-**Libraries**:whisper, spacy, torchtransformers, ffmpeg
 
 ## Contribution Guidelines
 
@@ -154,4 +142,10 @@ python main.py
 ## License
 
 This project is licensed under the **MIT License**.
+
+## Contact
+
+For queries and contributions, reach out via [email/contact link].
+
+🚀 **Revolutionizing Storytelling with AI-Powered Voice Modulation!** 🎙️
 

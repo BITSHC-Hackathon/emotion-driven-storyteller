@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 from .parser_gender import *
+from .emotion_detection import predict_emotion, emotion_classifier
 
 app = FastAPI()
 
@@ -32,6 +33,10 @@ class DialogueEntry(BaseModel):
     name: str
     dialogue: str
     predicted_gender: Optional[str] = None
+    emotion: Optional[str] = None
+
+class DialogueList(BaseModel):
+    dialogues: List[DialogueEntry]
 
 @app.post("/upload-script", response_model=List[DialogueEntry])
 async def upload_script(file: UploadFile = File(...)):
@@ -65,7 +70,7 @@ async def upload_script(file: UploadFile = File(...)):
             # Parse dialogues from script
             dialogues = parse_dialogues_and_narration(text)
             
-            # Add gender predictions
+            # Add gender predictions only
             updated_dialogues = add_gender_to_dialogues(dialogues, model)
             
             return updated_dialogues
@@ -74,5 +79,18 @@ async def upload_script(file: UploadFile = File(...)):
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
                 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/detect-emotions", response_model=List[DialogueEntry])
+async def detect_emotions(dialogues: DialogueList):
+    """Process dialogues and add emotion predictions."""
+    try:
+        # Add emotion predictions
+        for entry in dialogues.dialogues:
+            entry.emotion = predict_emotion(entry)
+        
+        print(dialogues.dialogues)  # Debug pri
+        return dialogues.dialogues
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -13,33 +13,33 @@ const StoryInput = () => {
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-  
+
     setIsLoading(true);
-  
-    if (file.type === 'application/pdf') {
+
+    if (file.type === "application/pdf") {
       try {
         const formData = new FormData();
-        formData.append('file', file);
-  
+        formData.append("file", file);
+
         // Updated endpoint to match the backend
-        const response = await fetch('http://localhost:8000/upload-script', {
-          method: 'POST',
+        const response = await fetch("http://localhost:8000/upload-script", {
+          method: "POST",
           body: formData,
           headers: {
-            'Accept': 'application/json',
+            Accept: "application/json",
           },
         });
-  
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-  
+
         const data = await response.json();
         // Update the extracted info directly with the response
         setExtractedInfo({ dialogues: data });
         setFileContent(file.name);
       } catch (error) {
-        console.error('Error processing PDF:', error);
+        console.error("Error processing PDF:", error);
         alert(`Error uploading file: ${error.message}`);
       } finally {
         setIsLoading(false);
@@ -71,7 +71,7 @@ const StoryInput = () => {
           {
             parts: [
               {
-                text: "Generate a short story with 2 characters and a narrator. The story should have clear character interactions, emotions, and narrative descriptions. Generate this story in a play/drama-like script format where character dialogues are marked as 'Character Name: [dialogue]' and narrative descriptions are marked as 'Narrator: [description]'. Include narrative descriptions between dialogues to set scenes and describe actions. Ensure proper formatting with each entry on a new line.",
+                text: "Generate a short story with multiple characters and a narrator. The story should have clear character interactions, MULTIPLE emotions, and narrative descriptions. Generate this story in a play/drama-like script format where character dialogues are marked as 'Character Name: [dialogue]' and narrative descriptions are marked as 'Narrator: [description]'. Include narrative descriptions between dialogues to set scenes and describe actions. Ensure proper formatting with each entry on a new line.",
               },
             ],
           },
@@ -143,11 +143,14 @@ const StoryInput = () => {
       });
 
       if (!geminiResponse.ok) {
-        throw new Error(`Gemini API Error: ${geminiResponse.status} ${geminiResponse.statusText}`);
+        throw new Error(
+          `Gemini API Error: ${geminiResponse.status} ${geminiResponse.statusText}`
+        );
       }
 
       const geminiData = await geminiResponse.json();
-      const analysisText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+      const analysisText =
+        geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
 
       // Clean the response and parse JSON
       const cleanJson = analysisText.replace(/```json\n|\n```|```/g, "").trim();
@@ -159,10 +162,38 @@ const StoryInput = () => {
     }
   };
 
-  // 📌 Proceed to Emotion Detection (Dummy Function)
-  const proceedToEmotionDetection = () => {
-    console.log("Proceeding to emotion detection with:", extractedInfo);
-    alert("Proceeding to emotion detection...");
+  // 📌 Proceed to Emotion Detection
+  const proceedToEmotionDetection = async () => {
+    try {
+      setIsLoading(true);
+      const dialogueList = {
+        dialogues: extractedInfo.dialogues.map((d) => ({
+          name: d.name,
+          dialogue: d.dialogue,
+          predicted_gender: d.predicted_gender || null,
+          emotion: null,
+        })),
+      };
+      const response = await fetch("http://localhost:8000/detect-emotions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dialogueList),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedDialogues = await response.json();
+      setExtractedInfo({ dialogues: updatedDialogues });
+    } catch (error) {
+      console.error("Error detecting emotions:", error);
+      alert(`Error detecting emotions: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

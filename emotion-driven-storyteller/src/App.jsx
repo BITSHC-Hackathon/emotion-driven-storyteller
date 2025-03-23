@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import "./App.css";
 import StoryInput from "./components/StoryInput";
+import Navbar from "./components/Navbar";
 import Typed from "typed.js";
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
 
   return (
     <div className="App">
+      <Navbar />
       <header className="App-header">
         <h1 className="text-5xl font-serif">
           <span ref={typingRef}></span>

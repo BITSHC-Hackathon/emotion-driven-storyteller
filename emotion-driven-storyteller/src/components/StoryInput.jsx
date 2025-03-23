@@ -6,21 +6,45 @@ const StoryInput = () => {
   const [extractedInfo, setExtractedInfo] = useState({ dialogues: [] });
   const [isLoading, setIsLoading] = useState(false);
 
-  const API_KEY = "AIzaSyAe67VaV2KyO2qxIrhqxyn7MdsVDQpLe44"; // Replace with your actual API key
+  const API_KEY = "AIzaSyD1WdS0RKr2AKKw7MRGsV9A9JAsGiLU1UY"; // Replace with your actual API key
   const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
   // 📌 Handle File Upload
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      const content = e.target.result;
-      setFileContent(content);
-      extractInformation(content);
-    };
-
-    reader.readAsText(file);
+    if (!file) return;
+  
+    setIsLoading(true);
+  
+    if (file.type === 'application/pdf') {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+  
+        // Updated endpoint to match the backend
+        const response = await fetch('http://localhost:8000/upload-script', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        // Update the extracted info directly with the response
+        setExtractedInfo({ dialogues: data });
+        setFileContent(file.name);
+      } catch (error) {
+        console.error('Error processing PDF:', error);
+        alert(`Error uploading file: ${error.message}`);
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   // 📌 Generate Story using Gemini API
@@ -86,6 +110,7 @@ const StoryInput = () => {
   // 📌 Extract Characters & Dialogues (Without Gender Field)
   const extractInformation = async (text) => {
     try {
+      // First, use Gemini API to extract dialogues
       const requestBody = {
         contents: [
           {
@@ -96,12 +121,12 @@ const StoryInput = () => {
                         Use this exact JSON format:
                         
                         {"dialogues": [
-                            {"id": 1, "name": "Speaker Name", "dialogue": "Spoken dialogue"},
-                            {"id": 2, "name": "Narrator", "dialogue": "Narrative description or scene setting"},
-                            {"id": 3, "name": "Next Speaker", "dialogue": "Next spoken dialogue"}
+                            {"id": 1, "name": "Speaker Name", "dialogue": "Spoken dialogue", "predicted_gender": "Male/Female"},
+                            {"id": 2, "name": "Narrator", "dialogue": "Narrative description or scene setting", "predicted_gender": "Male/Female"},
+                            {"id": 3, "name": "Next Speaker", "dialogue": "Next spoken dialogue", "predicted_gender": "Male/Female"}
                         ]}
                         
-                        Treat narrative descriptions as dialogues with "Narrator" as the speaker name. Do not include gender information.
+                        Treat narrative descriptions as dialogues with "Narrator" as the speaker name. Make sure that the gender of the Narrator is always "Male".
                         Do NOT return any explanations, markdown formatting, or additional text.
 
                         Story: ${text}`,
@@ -111,24 +136,23 @@ const StoryInput = () => {
         ],
       };
 
-      const response = await fetch(API_URL, {
+      const geminiResponse = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      if (!geminiResponse.ok) {
+        throw new Error(`Gemini API Error: ${geminiResponse.status} ${geminiResponse.statusText}`);
       }
 
-      const data = await response.json();
-      const analysisText =
-        data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+      const geminiData = await geminiResponse.json();
+      const analysisText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
 
       // Clean the response and parse JSON
       const cleanJson = analysisText.replace(/```json\n|\n```|```/g, "").trim();
-      const analysis = JSON.parse(cleanJson);
-      setExtractedInfo(analysis);
+      const initialAnalysis = JSON.parse(cleanJson);
+      setExtractedInfo(initialAnalysis);
     } catch (error) {
       console.error("Error analyzing story:", error);
       setExtractedInfo({ dialogues: [] });
@@ -155,7 +179,7 @@ const StoryInput = () => {
         <label className="block w-full max-w-md text-center">
           <input
             type="file"
-            accept=".txt"
+            accept=".pdf"
             onChange={handleFileUpload}
             className="input-field w-full file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary-600 file:text-white hover:file:bg-primary-700 cursor-pointer text-center"
           />

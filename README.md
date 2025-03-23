@@ -25,6 +25,7 @@ To overcome these challenges, this system:
 - **Final Output** – Delivers high-quality, dynamically modulated audiobooks.
 
 ## System Architecture
+<img src="Image/arching.jpeg"/>
 
 ### 1. Input Handling
 

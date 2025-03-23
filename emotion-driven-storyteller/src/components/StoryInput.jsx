@@ -5,6 +5,8 @@ const StoryInput = () => {
   const [fileContent, setFileContent] = useState("");
   const [extractedInfo, setExtractedInfo] = useState({ dialogues: [] });
   const [isLoading, setIsLoading] = useState(false);
+  const [audioUrl, setAudioUrl] = useState(null);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
 
   const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
   if (!API_KEY) {
@@ -74,7 +76,7 @@ const StoryInput = () => {
           {
             parts: [
               {
-                text: "Generate a short story with multiple characters and a narrator. The story should have clear character interactions, MULTIPLE emotions, and narrative descriptions. Generate this story in a play/drama-like script format where character dialogues are marked as 'Character Name: [dialogue]' and narrative descriptions are marked as 'Narrator: [description]'. Include narrative descriptions between dialogues to set scenes and describe actions. Ensure proper formatting with each entry on a new line.",
+                text: "Generate a short story with multiple characters and a narrator. The story should have clear character interactions, MULTIPLE emotions, and narrative descriptions. Generate this story in a play/drama-like script format where character dialogues are marked as 'Character Name: [dialogue]' and narrative descriptions are marked as 'Narrator: [description]'. Include narrative descriptions between dialogues to set scenes and describe actions. Ensure proper formatting with each entry on a new line. Make sure you generate maximum of 6 dialogues and not more than that.",
               },
             ],
           },
@@ -199,12 +201,34 @@ const StoryInput = () => {
     }
   };
 
+  // Add this function to handle audio generation
+  const handleGenerateAudio = async () => {
+    setIsGeneratingAudio(true);
+    try {
+      const response = await fetch("http://localhost:8000/generate-audio", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const url = URL.createObjectURL(audioBlob);
+      setAudioUrl(url);
+    } catch (error) {
+      console.error("Error generating audio:", error);
+      alert("Error generating audio. Please try again.");
+    } finally {
+      setIsGeneratingAudio(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8 animate-fade-in">
       <h2 className="text-4xl font-bold text-primary-300 mb-8 animate-slide-up">
         Story Input
       </h2>
-
       {/* File Upload Section */}
       <div className="card flex flex-col items-center justify-center">
         <h3 className="text-2xl font-semibold text-primary-200 mb-4 text-center">
@@ -219,7 +243,6 @@ const StoryInput = () => {
           />
         </label>
       </div>
-
       {/* Story Generation Section */}
       <div className="card">
         <h3 className="text-2xl font-semibold text-primary-200 mb-4">
@@ -259,7 +282,6 @@ const StoryInput = () => {
           )}
         </button>
       </div>
-
       {/* Story Preview Section */}
       {(fileContent || story) && (
         <div className="space-y-6 animate-slide-up">
@@ -304,8 +326,76 @@ const StoryInput = () => {
           </button>
         </div>
       )}
+      {/* // Add this JSX after your emotion detection results */}
+      {extractedInfo.dialogues.length > 0 && (
+        <div className="mt-8 flex flex-col items-center gap-4 animate-fade-in">
+          <button
+            onClick={handleGenerateAudio}
+            disabled={isGeneratingAudio}
+            className={`px-6 py-3 bg-accent-red rounded-full 
+        transition-all duration-300 hover:bg-accent-red/80
+        disabled:opacity-50 disabled:cursor-not-allowed
+        flex items-center justify-center gap-2
+        ${isGeneratingAudio ? "animate-pulse" : ""}`}
+          >
+            {isGeneratingAudio ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Generating Audio...
+              </>
+            ) : (
+              <>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 012.728-2.728"
+                  />
+                </svg>
+                Generate Audio
+              </>
+            )}
+          </button>
+
+          {audioUrl && (
+            <div className="w-full max-w-md animate-fade-in">
+              <audio controls className="w-full mt-4" src={audioUrl}>
+                Your browser does not support the audio element.
+              </audio>
+              <a
+                href={audioUrl}
+                download="story_audio.mp3"
+                className="mt-2 text-accent-red hover:text-accent-red/80 flex items-center justify-center gap-2"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+                Download Audio
+              </a>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
 export default StoryInput;
+
+// Add these state variables at the top of your component

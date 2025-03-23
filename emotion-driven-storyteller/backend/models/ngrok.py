@@ -2,7 +2,7 @@ import requests
 import os
 
 # Replace with the public URL generated from ngrok
-NGROK_URL = "https://f0ec-34-143-145-123.ngrok-free.app/"  # Remove trailing slash
+NGROK_URL = "https://2c9d-34-125-123-117.ngrok-free.app/"  # Remove trailing slash
 
 # Define paths
 current_dir = os.getcwd()

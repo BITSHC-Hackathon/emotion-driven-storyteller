@@ -1,101 +1,50 @@
-
-{
-  "story": [
+[
     {
-      "character": "narrator",
-      "gender": "male",
-      "emotion": "neutral",
-      "dialogue": "The group gathers in a dimly lit room, maps and notes scattered across the table."
+        "name": "Narrator",
+        "dialogue": "The bustling marketplace of Aethoria, filled with vibrant silks and exotic spices. Anya, a young seamstress, nervously adjusts her worn shawl, watching the charismatic merchant, Silas, bargain with a stern-faced noblewoman, Lady Beatrice.",
+        "predicted_gender": "Male",
+        "emotion": "neutral"
     },
     {
-      "character": "Alex",
-      "gender": "male",
-      "emotion": "neutral",
-      "dialogue": "I think we should discuss our plan before moving forward."
+        "name": "Silas",
+        "dialogue": "My Lady Beatrice: Surely such a discerning eye recognizes the unparalleled quality of this Sunstone silk! A mere twenty gold pieces is a pittance for such radiance!",
+        "predicted_gender": "Male",
+        "emotion": "neutral"
     },
     {
-      "character": "Emma",
-      "gender": "female",
-      "emotion": "happy",
-      "dialogue": "That sounds great! I'm really excited about this!"
+        "name": "Narrator",
+        "dialogue": "Lady Beatrice scoffs, her diamond earrings glinting in the sunlight. Anya shrinks further into the crowd, clutching a simple linen dress she hopes to sell.",
+        "predicted_gender": "Male",
+        "emotion": "neutral"
     },
     {
-      "character": "narrator",
-      "gender": "male",
-      "emotion": "angry",
-      "dialogue": "Frustration builds as the group's progress stalls."
+        "name": "Beatrice",
+        "dialogue": "You insult my intelligence, Silas. This silk is faded, the dye uneven. Fifteen, and not a copper more.",
+        "predicted_gender": "Female",
+        "emotion": "neutral"
     },
     {
-      "character": "Jake",
-      "gender": "male",
-      "emotion": "angry",
-      "dialogue": "This is ridiculous! We’ve been going in circles for hours!"
+        "name": "Narrator",
+        "dialogue": "Silas throws his hands up in mock despair, his jovial facade cracking slightly. Anya, seeing an opportunity, steps forward hesitantly.",
+        "predicted_gender": "Male",
+        "emotion": "neutral"
     },
     {
-      "character": "Sophia",
-      "gender": "female",
-      "emotion": "sad",
-      "dialogue": "I just don’t know if I can do this anymore... it’s too much."
+        "name": "Anya",
+        "dialogue": "Forgive my intrusion, my Lady, but I have a simple linen dress, strong and well-stitched. Perhaps it would suit a lady of your station for everyday wear?",
+        "predicted_gender": "Female",
+        "emotion": "neutral"
     },
     {
-      "character": "narrator",
-      "gender": "male",
-      "emotion": "fearful",
-      "dialogue": "A distant rustling sound pierces the silence, sending a chill down their spines."
+        "name": "Narrator",
+        "dialogue": "Lady Beatrice turns, her gaze sweeping over Anya with disdain, then lingering on the dress. A flicker of something unreadable crosses her face.",
+        "predicted_gender": "Male",
+        "emotion": "neutral"
     },
     {
-      "character": "Alex",
-      "gender": "male",
-      "emotion": "fearful",
-      "dialogue": "Wait... did you hear that? Something is out there!"
-    },
-    {
-      "character": "Emma",
-      "gender": "female",
-      "emotion": "neutral",
-      "dialogue": "Let’s stay calm and figure this out logically."
-    },
-    {
-      "character": "narrator",
-      "gender": "male",
-      "emotion": "happy",
-      "dialogue": "Relief washes over Jake as he finally sees a way forward."
-    },
-    {
-      "character": "Jake",
-      "gender": "male",
-      "emotion": "happy",
-      "dialogue": "Haha! See? I told you we'd make it through!"
-    },
-    {
-      "character": "Sophia",
-      "gender": "female",
-      "emotion": "surprised",
-      "dialogue": "Wait... you mean we were right all along?!"
-    },
-    {
-      "character": "narrator",
-      "gender": "male",
-      "emotion": "disgusted",
-      "dialogue": "A foul stench lingers in the air, making Alex recoil in discomfort."
-    },
-    {
-      "character": "Alex",
-      "gender": "male",
-      "emotion": "disgusted",
-      "dialogue": "Ugh, what is that smell? This place is awful!"
-    },
-    {
-      "character": "narrator",
-      "gender": "male",
-      "emotion": "fearful",
-      "dialogue": "A creeping sense of unease settles over the group as Emma's instincts scream danger."
-    },
-    {
-      "character": "Emma",
-      "gender": "female",
-      "emotion": "fearful",
-      "dialogue": "I don't like this... I have a really bad feeling about this..."
+        "name": "Beatrice",
+        "dialogue": "Let me see it.",
+        "predicted_gender": "Female",
+        "emotion": "neutral"
     }
-  ]
-}
+]

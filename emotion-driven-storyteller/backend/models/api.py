@@ -1,5 +1,8 @@
 import os
-from fastapi import FastAPI, HTTPException, UploadFile, File
+import subprocess
+import json
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
@@ -87,10 +90,67 @@ async def detect_emotions(dialogues: DialogueList):
     """Process dialogues and add emotion predictions."""
     try:
         # Add emotion predictions
+        updated_dialogues = []
         for entry in dialogues.dialogues:
-            entry.emotion = predict_emotion(entry)
+            try:
+                entry_dict = entry.dict()
+                entry_dict['emotion'] = predict_emotion(entry)
+                updated_dialogues.append(entry_dict)
+            except Exception as e:
+                print(f"Error processing entry {entry.name}: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Error processing entry {entry.name}: {str(e)}")
         
-        print(dialogues.dialogues)  # Debug pri
-        return dialogues.dialogues
+        # Save the processed dialogues to story.json
+        story_path = os.path.join(os.path.dirname(__file__), "story.json")
+        try:
+            with open(story_path, 'w', encoding='utf-8') as f:
+                json.dump(updated_dialogues, f, indent=4, ensure_ascii=False)
+        except Exception as e:
+            print(f"Error saving to story.json: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Error saving to story.json: {str(e)}")
+        
+        return updated_dialogues
+    except Exception as e:
+        if not isinstance(e, HTTPException):
+            raise HTTPException(status_code=500, detail=str(e))
+        raise e
+
+
+@app.get("/generate-audio")
+async def generate_audio():
+    try:
+        # Define paths
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        ngrok_script = os.path.join(current_dir, 'ngrok.py')
+        story_path = os.path.join(current_dir, "story.json")
+
+        # Ensure story.json exists
+        if not os.path.exists(story_path):
+            raise HTTPException(status_code=400, detail="No story data found. Please process the story first.")
+
+        # Run ngrok script
+        result = subprocess.run(
+            ['python', ngrok_script],
+            check=True,
+            cwd=current_dir,
+            capture_output=True,
+            text=True
+        )
+
+        # Get the generated audio file
+        audio_path = os.path.join(current_dir, "audio_output", "final_story.mp3")
+        if not os.path.exists(audio_path):
+            raise HTTPException(
+                status_code=500,
+                detail=f"Audio file not generated. Script output: {result.stdout}\nError: {result.stderr}"
+            )
+
+        return FileResponse(audio_path, media_type="audio/mpeg", filename="final_story.mp3")
+
+    except subprocess.CalledProcessError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error running ngrok script: {e.stdout}\nError: {e.stderr}"
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
